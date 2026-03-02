@@ -1,6 +1,6 @@
 # LK FX Dashboard
 
-A daily exchange rate monitoring dashboard built with .NET 10, Blazor, and .NET Aspire. Scrapes FX rates from 4 Sri Lankan bank/financial sources and displays current + historical data via a dark-themed dashboard with ApexCharts.
+A daily exchange rate monitoring dashboard built with .NET 10, Blazor, and .NET Aspire. Scrapes FX rates from 4 Sri Lankan bank/financial sources (Standard Chartered, CBSL, Commercial Bank, HSBC) and displays current + historical data via a dark-themed dashboard with ApexCharts.
 
 ## Prerequisites
 
@@ -48,7 +48,7 @@ LkFxDashboard.AppHost          <- Aspire orchestrator (startup project)
 |--------|--------|---------|
 | Standard Chartered LK | HTML scraping | AngleSharp |
 | CBSL (Central Bank) | HTML scraping | AngleSharp |
-| OANDA | HTML / Puppeteer fallback | AngleSharp + PuppeteerSharp |
+| Commercial Bank (COMBANK) | HTML scraping | AngleSharp |
 | HSBC LK | PDF parsing | PdfPig |
 
 ## API Endpoints
@@ -78,8 +78,7 @@ Edit `src/LkFxDashboard.Web/appsettings.json`:
   "Scraping": {
     "StandardCharteredUrl": "https://www.sc.com/lk/...",
     "CbslUrl": "https://www.cbsl.gov.lk/...",
-    "OandaUrl": "https://www.oanda.com/...",
-    "OandaUsePuppeteer": false,
+    "ComBankUrl": "https://www.combank.lk/rates-tariff#exchange-rates",
     "HsbcPdfUrl": "https://www.hsbc.lk/...",
     "TimeoutSeconds": 30,
     "PoliteDelayMs": 2000
@@ -118,4 +117,4 @@ dotnet test
 - ApexCharts (Blazor-ApexCharts)
 - Tailwind CSS v4
 - Serilog structured logging
-- AngleSharp, PdfPig, PuppeteerSharp (scrapers)
+- AngleSharp, PdfPig (scrapers)

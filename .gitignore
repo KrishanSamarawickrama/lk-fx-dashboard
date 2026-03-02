@@ -51,6 +51,4 @@ Thumbs.db
 ## Secrets
 appsettings.*.local.json
 
-## PuppeteerSharp browser downloads
-.local-chromium/
 /.claude

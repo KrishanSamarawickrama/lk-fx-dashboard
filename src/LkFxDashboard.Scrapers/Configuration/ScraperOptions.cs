@@ -17,20 +17,10 @@ public class ScraperOptions
         "https://www.cbsl.gov.lk/cbsl_custom/exratestt/exrates_resultstt.php";
 
     /// <summary>
-    /// OANDA currency converter page.
+    /// Commercial Bank of Ceylon exchange rates page.
     /// </summary>
-    public string OandaUrl { get; set; } =
-        "https://www.oanda.com/currency-converter/en/?from=USD&to=LKR&amount=1";
-
-    /// <summary>
-    /// Whether to use PuppeteerSharp for OANDA (required — plain HTTP does not work).
-    /// </summary>
-    public bool OandaUsePuppeteer { get; set; } = true;
-
-    /// <summary>
-    /// Whether OANDA scraping is enabled (requires Chromium download on first run).
-    /// </summary>
-    public bool OandaEnabled { get; set; } = false;
+    public string ComBankUrl { get; set; } =
+        "https://www.combank.lk/rates-tariff#exchange-rates";
 
     /// <summary>
     /// HSBC LK foreign exchange rates PDF.
