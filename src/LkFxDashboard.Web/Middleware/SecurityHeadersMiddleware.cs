@@ -12,14 +12,16 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
         headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()";
         headers["Content-Security-Policy"] =
             "default-src 'self'; " +
-            "script-src 'self' 'unsafe-inline'; " +
+            "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; " +
             "style-src 'self' 'unsafe-inline'; " +
-            "img-src 'self' data:; " +
+            "img-src 'self' data: https:; " +
             "font-src 'self'; " +
-            "connect-src 'self' wss:; " +
+            "object-src 'none'; " +
+            "connect-src 'self' http: ws: wss: https://cloudflareinsights.com; " +
             "frame-ancestors 'none'; " +
             "base-uri 'self'; " +
-            "form-action 'self'";
+            "form-action 'self'; " +
+            "upgrade-insecure-requests";
 
         headers.Remove("Server");
 

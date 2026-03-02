@@ -136,8 +136,10 @@ using (var scope = app.Services.CreateScope())
 
 app.MapDefaultEndpoints();
 app.MapRateEndpoints();
+app.MapStaticAssets();
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+    .AddInteractiveServerRenderMode(o =>
+        o.ContentSecurityFrameAncestorsPolicy = "'none'");
 
 app.Run();
 

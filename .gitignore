@@ -1,3 +1,6 @@
+## Secrets
+deployment/.env
+
 ## .NET
 bin/
 obj/

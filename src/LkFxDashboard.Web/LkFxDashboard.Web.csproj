@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TailwindCLI>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\tailwindcss-windows-x64.exe'))</TailwindCLI>
+    <!-- Ensure microsoft.aspnetcore.app.internal.assets is restored for Docker builds
+         so that _framework/blazor.web.js is included in the publish output. -->
+    <RequiresAspNetWebAssets>true</RequiresAspNetWebAssets>
   </PropertyGroup>
 
   <Target Name="BuildTailwind" BeforeTargets="Build">
