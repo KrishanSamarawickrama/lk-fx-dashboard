@@ -52,3 +52,4 @@ Thumbs.db
 appsettings.*.local.json
 
 /.claude
+CLAUDE.md

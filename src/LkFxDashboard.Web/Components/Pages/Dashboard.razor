@@ -1,6 +1,7 @@
 @page "/"
 @inject IRateService RateService
 @inject ILogger<Dashboard> Logger
+@inject IOptions<SecurityOptions> SecurityOpts
 
 <PageTitle>LK FX Dashboard</PageTitle>
 
@@ -15,7 +16,42 @@
             <CurrencySelector SelectedCurrency="@selectedCurrency"
                               SelectedCurrencyChanged="OnCurrencyChanged" />
             <LastUpdatedBadge LastUpdated="@lastUpdated" />
-            <RefreshButton IsRefreshing="@isRefreshing" OnRefresh="OnRefresh" />
+            @if (isAdmin)
+            {
+                <RefreshButton IsRefreshing="@isRefreshing" OnRefresh="OnRefresh" />
+            }
+            else if (showPinEntry)
+            {
+                <div class="flex items-center gap-2">
+                    <input type="password" maxlength="20" placeholder="Enter PIN"
+                           class="w-28 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500"
+                           @bind="enteredPin" @bind:event="oninput"
+                           @onkeydown="OnPinKeyDown" />
+                    <button class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors"
+                            @onclick="VerifyPin">
+                        OK
+                    </button>
+                    <button class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                            @onclick="() => showPinEntry = false">
+                        Cancel
+                    </button>
+                </div>
+                @if (pinError is not null)
+                {
+                    <span class="text-rose-400 text-xs">@pinError</span>
+                }
+            }
+            else
+            {
+                <button class="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded-lg transition-colors"
+                        @onclick="() => showPinEntry = true">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span>Admin</span>
+                </button>
+            }
         </div>
     </div>
 
@@ -52,6 +88,11 @@
     private bool isRefreshing;
     private DateTime? lastUpdated;
     private string? errorMessage;
+
+    private bool isAdmin;
+    private bool showPinEntry;
+    private string enteredPin = string.Empty;
+    private string? pinError;
 
     private IReadOnlyList<ExchangeRate> latestRates = [];
     private IReadOnlyList<ExchangeRate> previousRates = [];
@@ -92,6 +133,30 @@
     {
         selectedDays = days;
         historyData = await RateService.GetHistoryAsync(selectedCurrency, selectedDays);
+    }
+
+    private void VerifyPin()
+    {
+        var correctPin = SecurityOpts.Value.AdminPin;
+        if (string.Equals(enteredPin, correctPin, StringComparison.Ordinal))
+        {
+            isAdmin = true;
+            showPinEntry = false;
+            pinError = null;
+            enteredPin = string.Empty;
+        }
+        else
+        {
+            pinError = "Incorrect PIN";
+        }
+    }
+
+    private void OnPinKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            VerifyPin();
+        }
     }
 
     private async Task OnRefresh()

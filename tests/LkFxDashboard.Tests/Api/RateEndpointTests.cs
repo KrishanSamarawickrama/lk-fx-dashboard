@@ -13,12 +13,18 @@ namespace LkFxDashboard.Tests.Api;
 
 public class RateEndpointTests : IClassFixture<WebApplicationFactory<Program>>
 {
+    private const string TestApiKey = "test-api-key-for-integration";
+    private const string TestAdminPin = "9999";
+
     private readonly WebApplicationFactory<Program> _factory;
 
     public RateEndpointTests(WebApplicationFactory<Program> factory)
     {
         _factory = factory.WithWebHostBuilder(builder =>
         {
+            builder.UseSetting("Security:ApiKey", TestApiKey);
+            builder.UseSetting("Security:AdminPin", TestAdminPin);
+
             builder.ConfigureServices(services =>
             {
                 // Remove ALL DbContext, EF Core, and Npgsql/Aspire-related registrations
@@ -104,10 +110,53 @@ public class RateEndpointTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task TriggerScrape_ReturnsOk()
+    public async Task TriggerScrape_WithValidApiKey_ReturnsOk()
+    {
+        var client = _factory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/scrape/trigger");
+        request.Headers.Add("X-Api-Key", TestApiKey);
+
+        var response = await client.SendAsync(request);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task TriggerScrape_WithoutApiKey_ReturnsUnauthorized()
     {
         var client = _factory.CreateClient();
         var response = await client.PostAsync("/api/scrape/trigger", null);
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task TriggerScrape_WithWrongApiKey_ReturnsUnauthorized()
+    {
+        var client = _factory.CreateClient();
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/scrape/trigger");
+        request.Headers.Add("X-Api-Key", "wrong-key");
+
+        var response = await client.SendAsync(request);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task TriggerScrape_ExceedingRateLimit_Returns429()
+    {
+        var client = _factory.CreateClient();
+
+        // Send 2 requests (within the limit)
+        for (var i = 0; i < 2; i++)
+        {
+            var req = new HttpRequestMessage(HttpMethod.Post, "/api/scrape/trigger");
+            req.Headers.Add("X-Api-Key", TestApiKey);
+            await client.SendAsync(req);
+        }
+
+        // Third request should be rate-limited
+        var thirdRequest = new HttpRequestMessage(HttpMethod.Post, "/api/scrape/trigger");
+        thirdRequest.Headers.Add("X-Api-Key", TestApiKey);
+        var response = await client.SendAsync(thirdRequest);
+
+        response.StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
     }
 }

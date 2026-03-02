@@ -1,3 +1,4 @@
+using LkFxDashboard.Api.Security;
 using LkFxDashboard.Core.Extensions;
 using LkFxDashboard.Core.Interfaces;
 using LkFxDashboard.Core.Models;
@@ -23,7 +24,7 @@ public static class RateEndpoints
             return rates.Count > 0
                 ? Results.Ok(rates)
                 : Results.Ok(Array.Empty<ExchangeRate>());
-        });
+        }).RequireRateLimiting("api-read");
 
         group.MapGet("/history", async (
             string? currency,
@@ -35,7 +36,7 @@ public static class RateEndpoints
             var historyDays = days ?? 30;
             var rates = await repository.GetHistoryAsync(targetCurrency, historyDays, cancellationToken);
             return Results.Ok(rates);
-        });
+        }).RequireRateLimiting("api-read");
 
         app.MapGet("/api/currencies", async (
             IExchangeRateRepository repository,
@@ -56,7 +57,7 @@ public static class RateEndpoints
             }).ToList();
 
             return Results.Ok(currencyInfos);
-        });
+        }).RequireRateLimiting("api-read");
 
         app.MapPost("/api/scrape/trigger", async (
             IEnumerable<IExchangeRateScraper> scrapers,
@@ -84,7 +85,7 @@ public static class RateEndpoints
             }
 
             return Results.Ok(new { scraped = allRates.Count });
-        });
+        }).AddEndpointFilter<ApiKeyEndpointFilter>().RequireRateLimiting("trigger");
 
         return app;
     }
