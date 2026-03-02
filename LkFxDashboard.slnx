@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LkFxDashboard.Api/LkFxDashboard.Api.csproj" />
+    <Project Path="src/LkFxDashboard.AppHost/LkFxDashboard.AppHost.csproj" />
+    <Project Path="src/LkFxDashboard.Core/LkFxDashboard.Core.csproj" />
+    <Project Path="src/LkFxDashboard.Data/LkFxDashboard.Data.csproj" />
+    <Project Path="src/LkFxDashboard.Scrapers/LkFxDashboard.Scrapers.csproj" />
+    <Project Path="src/LkFxDashboard.ServiceDefaults/LkFxDashboard.ServiceDefaults.csproj" />
+    <Project Path="src/LkFxDashboard.Web/LkFxDashboard.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/LkFxDashboard.Tests/LkFxDashboard.Tests.csproj" />
+  </Folder>
+</Solution>

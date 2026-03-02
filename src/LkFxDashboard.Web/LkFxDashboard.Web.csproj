@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TailwindCLI>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\tailwindcss-windows-x64.exe'))</TailwindCLI>
+  </PropertyGroup>
+
+  <Target Name="BuildTailwind" BeforeTargets="Build">
+    <Exec Command="&quot;$(TailwindCLI)&quot; -i Properties/tailwind.input.css -o wwwroot/css/tailwind.css --minify"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          ConsoleToMSBuild="true"
+          Condition="Exists('$(TailwindCLI)')" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.1.2" />
+    <PackageReference Include="Blazor-ApexCharts" Version="6.1.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LkFxDashboard.ServiceDefaults\LkFxDashboard.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\LkFxDashboard.Api\LkFxDashboard.Api.csproj" />
+  </ItemGroup>
+
+</Project>

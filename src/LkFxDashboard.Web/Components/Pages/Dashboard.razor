@@ -1,0 +1,118 @@
+@page "/"
+@inject IRateService RateService
+@inject ILogger<Dashboard> Logger
+
+<PageTitle>LK FX Dashboard</PageTitle>
+
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-100">Exchange Rates</h1>
+            <p class="text-sm text-gray-500 mt-1">LKR per 1 @selectedCurrency</p>
+        </div>
+        <div class="flex items-center gap-4 flex-wrap">
+            <CurrencySelector SelectedCurrency="@selectedCurrency"
+                              SelectedCurrencyChanged="OnCurrencyChanged" />
+            <LastUpdatedBadge LastUpdated="@lastUpdated" />
+            <RefreshButton IsRefreshing="@isRefreshing" OnRefresh="OnRefresh" />
+        </div>
+    </div>
+
+    @if (errorMessage is not null)
+    {
+        <div class="bg-rose-900/30 border border-rose-700 rounded-xl p-4 text-rose-300 text-sm">
+            @errorMessage
+        </div>
+    }
+
+    <!-- Rate Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        @foreach (var source in ScraperSource.All)
+        {
+            var rate = latestRates.FirstOrDefault(r => r.Source == source);
+            var prevRate = previousRates.FirstOrDefault(r => r.Source == source);
+            <RateSummaryCard Source="@source" Rate="@rate" PreviousRate="@prevRate" />
+        }
+    </div>
+
+    <!-- History Chart -->
+    <HistoryChart Currency="@selectedCurrency"
+                  HistoryData="@historyData"
+                  SelectedDays="@selectedDays"
+                  SelectedDaysChanged="OnDaysChanged" />
+
+    <!-- Source Comparison Table -->
+    <SourceComparisonTable Rates="@latestRates" />
+</div>
+
+@code {
+    private string selectedCurrency = "USD";
+    private int selectedDays = 30;
+    private bool isRefreshing;
+    private DateTime? lastUpdated;
+    private string? errorMessage;
+
+    private IReadOnlyList<ExchangeRate> latestRates = [];
+    private IReadOnlyList<ExchangeRate> previousRates = [];
+    private IReadOnlyList<ExchangeRate> historyData = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        latestRates = await RateService.GetLatestRatesAsync(selectedCurrency);
+        historyData = await RateService.GetHistoryAsync(selectedCurrency, selectedDays);
+
+        // Get previous day's rates for trend comparison
+        var allHistory = await RateService.GetHistoryAsync(selectedCurrency, 2);
+        var latestDate = latestRates.FirstOrDefault()?.RateDate;
+        if (latestDate.HasValue)
+        {
+            previousRates = allHistory
+                .Where(r => r.RateDate < latestDate.Value)
+                .ToList();
+        }
+
+        lastUpdated = latestRates
+            .Select(r => (DateTime?)r.CollectedAt)
+            .Max();
+    }
+
+    private async Task OnCurrencyChanged(string currency)
+    {
+        selectedCurrency = currency;
+        await LoadData();
+    }
+
+    private async Task OnDaysChanged(int days)
+    {
+        selectedDays = days;
+        historyData = await RateService.GetHistoryAsync(selectedCurrency, selectedDays);
+    }
+
+    private async Task OnRefresh()
+    {
+        isRefreshing = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            await RateService.RefreshRatesAsync();
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error during refresh");
+            errorMessage = $"Refresh failed: {ex.Message}";
+        }
+        finally
+        {
+            isRefreshing = false;
+        }
+    }
+}

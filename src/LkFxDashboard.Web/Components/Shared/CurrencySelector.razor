@@ -1,0 +1,39 @@
+@inject IRateService RateService
+@inject NavigationManager Navigation
+
+<div class="flex items-center gap-3">
+    <label for="currency-select" class="text-sm font-medium text-gray-400">Currency</label>
+    <select id="currency-select"
+            class="bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-4 py-2 text-sm
+                   focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none
+                   cursor-pointer hover:border-gray-600 transition-colors"
+            value="@SelectedCurrency"
+            @onchange="OnCurrencyChanged">
+        @foreach (var currency in Currencies)
+        {
+            <option value="@currency.Code">@currency.Code &mdash; @currency.Name</option>
+        }
+    </select>
+</div>
+
+@code {
+    [Parameter]
+    public string SelectedCurrency { get; set; } = "USD";
+
+    [Parameter]
+    public EventCallback<string> SelectedCurrencyChanged { get; set; }
+
+    private IReadOnlyList<CurrencyInfo> Currencies { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Currencies = await RateService.GetCurrenciesAsync();
+    }
+
+    private async Task OnCurrencyChanged(ChangeEventArgs e)
+    {
+        var currency = e.Value?.ToString() ?? "USD";
+        SelectedCurrency = currency;
+        await SelectedCurrencyChanged.InvokeAsync(currency);
+    }
+}
