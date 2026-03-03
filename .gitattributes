@@ -1,0 +1,46 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# C# / .NET source files
+*.cs        text diff=csharp
+*.csproj    text
+*.slnx      text
+*.sln       text
+*.props     text
+*.targets   text
+
+# Web files
+*.razor     text
+*.cshtml    text
+*.html      text
+*.css       text
+*.js        text
+*.json      text
+
+# Config / docs
+*.md        text
+*.yml       text
+*.yaml      text
+*.xml       text
+*.txt       text
+
+# Shell scripts must use LF
+*.sh        text eol=lf
+
+# PowerShell can use CRLF
+*.ps1       text eol=crlf
+*.psm1      text eol=crlf
+
+# Binary files
+*.pdf       binary
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.eot       binary
+*.exe       binary
+*.dll       binary
