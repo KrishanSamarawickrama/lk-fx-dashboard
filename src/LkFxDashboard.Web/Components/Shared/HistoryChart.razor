@@ -22,7 +22,8 @@
     {
         <ApexChart TItem="ChartPoint"
                    Options="ChartOptions"
-                   Height="350">
+                   Height="350"
+                   @key="chartVersion">
             @foreach (var source in ChartData.GroupBy(d => d.Source))
             {
                 <ApexPointSeries TItem="ChartPoint"
@@ -59,6 +60,9 @@
 
     private ApexChartOptions<ChartPoint> ChartOptions { get; set; } = new();
 
+    private int chartVersion;
+    private IReadOnlyList<ExchangeRate>? lastHistoryData;
+
     protected override void OnInitialized()
     {
         ConfigureChart();
@@ -72,6 +76,12 @@
             Rate = r.BuyingRate,
             Source = r.Source
         }).ToList();
+
+        if (!ReferenceEquals(HistoryData, lastHistoryData))
+        {
+            lastHistoryData = HistoryData;
+            chartVersion++;
+        }
     }
 
     private void ConfigureChart()
