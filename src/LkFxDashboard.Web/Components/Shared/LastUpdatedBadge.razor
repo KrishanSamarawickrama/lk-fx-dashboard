@@ -1,0 +1,42 @@
+<div class="flex items-center gap-2 text-sm">
+    @if (LastUpdated.HasValue)
+    {
+        var elapsed = DateTime.UtcNow - LastUpdated.Value;
+        var isStale = elapsed.TotalHours > 25;
+
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
+                     @(isStale ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400")">
+            <span class="relative flex h-2 w-2">
+                @if (isStale)
+                {
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                }
+                else
+                {
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                }
+            </span>
+            Updated @FormatTimeAgo(elapsed)
+        </span>
+    }
+    else
+    {
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-800 text-gray-500">
+            No data yet
+        </span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public DateTime? LastUpdated { get; set; }
+
+    private static string FormatTimeAgo(TimeSpan elapsed)
+    {
+        if (elapsed.TotalMinutes < 1) return "just now";
+        if (elapsed.TotalMinutes < 60) return $"{(int)elapsed.TotalMinutes}m ago";
+        if (elapsed.TotalHours < 24) return $"{(int)elapsed.TotalHours}h ago";
+        return $"{(int)elapsed.TotalDays}d ago";
+    }
+}

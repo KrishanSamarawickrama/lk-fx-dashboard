@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="css/tailwind.css" />
+    <link rel="stylesheet" href="css/app.css" />
+    <ImportMap />
+    <HeadOutlet @rendermode="RenderMode.InteractiveServer" />
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen antialiased">
+    <Routes @rendermode="RenderMode.InteractiveServer" />
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+# Version control
+**/.git
+**/.github
+**/.gitignore
+**/.gitattributes
+
+# IDE / editor
+**/.vs
+**/.vscode
+**/.idea
+**/*.user
+**/*.suo
+
+# Build output
+**/bin
+**/obj
+
+# Node
+**/node_modules
+
+# Tests (not needed in production image)
+**/tests
+
+# Documentation (not needed in production image)
+**/*.md
+**/LICENSE
+
+# Environment and secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Tooling
+**/tailwindcss-windows-x64.exe
+**/.claude
+
+# Docker (avoid recursive copy)
+**/docker-compose.yml
+**/Dockerfile
+
+# OS files
+**/.DS_Store
+**/Thumbs.db

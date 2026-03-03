@@ -1,0 +1,73 @@
+@using LkFxDashboard.Core.Models
+
+<div class="bg-gray-900 rounded-2xl shadow-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors">
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium text-gray-400">@Source</h3>
+        @if (TrendDirection != 0)
+        {
+            <span class="text-xs font-medium px-2 py-1 rounded-full @(TrendDirection > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400")">
+                @(TrendDirection > 0 ? "\u2191" : "\u2193") @Math.Abs(TrendPercent).ToString("F2")%
+            </span>
+        }
+    </div>
+
+    @if (Rate is not null)
+    {
+        <div class="space-y-3">
+            <div class="flex justify-between items-baseline">
+                <span class="text-xs text-gray-500 uppercase tracking-wider">Buy</span>
+                <span class="text-2xl font-mono font-semibold text-gray-100">
+                    @Rate.BuyingRate.ToString("N2")
+                </span>
+            </div>
+            <div class="flex justify-between items-baseline">
+                <span class="text-xs text-gray-500 uppercase tracking-wider">Sell</span>
+                <span class="text-2xl font-mono font-semibold text-gray-100">
+                    @Rate.SellingRate.ToString("N2")
+                </span>
+            </div>
+            <div class="flex justify-between items-baseline pt-2 border-t border-gray-800">
+                <span class="text-xs text-gray-500 uppercase tracking-wider">Spread</span>
+                <span class="text-sm font-mono text-gray-400">
+                    @((Rate.SellingRate - Rate.BuyingRate).ToString("N2"))
+                </span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-4 text-gray-500 text-sm">
+            No data available
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Source { get; set; } = string.Empty;
+
+    [Parameter]
+    public ExchangeRate? Rate { get; set; }
+
+    [Parameter]
+    public ExchangeRate? PreviousRate { get; set; }
+
+    private int TrendDirection
+    {
+        get
+        {
+            if (Rate is null || PreviousRate is null) return 0;
+            var diff = Rate.BuyingRate - PreviousRate.BuyingRate;
+            return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+        }
+    }
+
+    private decimal TrendPercent
+    {
+        get
+        {
+            if (Rate is null || PreviousRate is null || PreviousRate.BuyingRate == 0) return 0;
+            return (Rate.BuyingRate - PreviousRate.BuyingRate) / PreviousRate.BuyingRate * 100;
+        }
+    }
+}

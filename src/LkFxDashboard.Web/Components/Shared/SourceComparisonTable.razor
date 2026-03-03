@@ -1,0 +1,53 @@
+<div class="bg-gray-900 rounded-2xl shadow-lg p-6 border border-gray-800">
+    <h3 class="text-lg font-semibold text-gray-100 mb-4">Source Comparison</h3>
+
+    @if (Rates.Count > 0)
+    {
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-gray-800">
+                        <th class="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Buying Rate</th>
+                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Selling Rate</th>
+                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Spread</th>
+                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rate in Rates)
+                    {
+                        var isBestBuy = rate.BuyingRate == Rates.Max(r => r.BuyingRate);
+                        var isBestSell = rate.SellingRate == Rates.Min(r => r.SellingRate);
+                        <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+                            <td class="py-3 px-4 font-medium text-gray-300">@rate.Source</td>
+                            <td class="py-3 px-4 text-right font-mono @(isBestBuy ? "text-emerald-400 font-semibold" : "text-gray-300")">
+                                @rate.BuyingRate.ToString("N2")
+                            </td>
+                            <td class="py-3 px-4 text-right font-mono @(isBestSell ? "text-emerald-400 font-semibold" : "text-gray-300")">
+                                @rate.SellingRate.ToString("N2")
+                            </td>
+                            <td class="py-3 px-4 text-right font-mono text-gray-400">
+                                @((rate.SellingRate - rate.BuyingRate).ToString("N2"))
+                            </td>
+                            <td class="py-3 px-4 text-right text-gray-500">
+                                @rate.RateDate.ToString("yyyy-MM-dd")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-8 text-gray-500">
+            No rates available for comparison
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<ExchangeRate> Rates { get; set; } = [];
+}
