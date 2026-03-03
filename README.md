@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-blueviolet)](https://dotnet.microsoft.com/download/dotnet/10.0)
-[![CI](https://github.com/krishans1990/lk-fx-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/krishans1990/lk-fx-dashboard/actions/workflows/ci.yml)
+[![CI](https://github.com/KrishanSamarawickrama/lk-fx-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/krishans1990/lk-fx-dashboard/actions/workflows/ci.yml)
 
 A daily foreign exchange rate monitoring dashboard for Sri Lanka. Scrapes buy/sell rates from four banking sources, stores them in PostgreSQL, and presents current and historical data in a dark-themed Blazor dashboard with interactive charts.
 
