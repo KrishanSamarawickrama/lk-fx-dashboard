@@ -7,6 +7,7 @@ public static class ScraperSource
     public const string ComBank = "Commercial Bank";
     public const string Hsbc = "HSBC";
     public const string Dfcc = "DFCC";
+    public const string Hnb = "HNB";
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -14,6 +15,7 @@ public static class ScraperSource
         Cbsl,
         ComBank,
         Hsbc,
-        Dfcc
+        Dfcc,
+        Hnb
     ];
 }

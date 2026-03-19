@@ -34,6 +34,12 @@ public class ScraperOptions
     public string DfccUrl { get; set; } =
         "https://www.dfcc.lk/rates-and-tariff/exchange-rates";
 
+    /// <summary>
+    /// HNB exchange rates JSON API.
+    /// </summary>
+    public string HnbUrl { get; set; } =
+        "https://venus.hnb.lk/api/get_exchange_rates_contents_web";
+
     public int TimeoutSeconds { get; set; } = 30;
     public int PoliteDelayMs { get; set; } = 2000;
 }
