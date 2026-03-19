@@ -71,6 +71,15 @@ public static class ScraperServiceCollectionExtensions
         services.AddTransient<IExchangeRateScraper>(sp =>
             sp.GetRequiredService<HnbScraper>());
 
+        services.AddHttpClient<BocScraper>(client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(30);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+        });
+        services.AddTransient<IExchangeRateScraper>(sp =>
+            sp.GetRequiredService<BocScraper>());
+
         return services;
     }
 }

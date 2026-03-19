@@ -40,6 +40,12 @@ public class ScraperOptions
     public string HnbUrl { get; set; } =
         "https://venus.hnb.lk/api/get_exchange_rates_contents_web";
 
+    /// <summary>
+    /// Bank of Ceylon exchange rates page.
+    /// </summary>
+    public string BocUrl { get; set; } =
+        "https://www.boc.lk/rates-tariff";
+
     public int TimeoutSeconds { get; set; } = 30;
     public int PoliteDelayMs { get; set; } = 2000;
 }
