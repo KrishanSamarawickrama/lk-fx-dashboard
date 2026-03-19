@@ -28,6 +28,12 @@ public class ScraperOptions
     public string HsbcPdfUrl { get; set; } =
         "https://www.hsbc.lk/content/dam/hsbc/lk/documents/tariffs/foreign-exchange-rates.pdf";
 
+    /// <summary>
+    /// DFCC Bank exchange rates page.
+    /// </summary>
+    public string DfccUrl { get; set; } =
+        "https://www.dfcc.lk/rates-and-tariff/exchange-rates";
+
     public int TimeoutSeconds { get; set; } = 30;
     public int PoliteDelayMs { get; set; } = 2000;
 }
