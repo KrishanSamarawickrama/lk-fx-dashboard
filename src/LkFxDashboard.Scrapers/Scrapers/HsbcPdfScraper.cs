@@ -27,14 +27,15 @@ public class HsbcPdfScraper(
 
     // Column X boundaries determined from header word positions in the PDF
     // CCY Code column: X ≈ 180-240
-    // TT Buy column:   X ≈ 240-320  (data starts at X=271 for large, X=277/282 for small values)
-    // TT Sell column:  X ≈ 320-400  (data starts at X=341 for large, X=346/351 for small values)
+    // TT Buy column:   X ≈ 240-310  (data starts at X=260-282)
+    // TT Sell column:  X ≈ 310-370  (data starts at X=325-352)
+    // Note: columns after TT Sell (Currency Buy/Sell) start at X≈385+
     private const double CodeMinX = 180;
     private const double CodeMaxX = 240;
     private const double TtBuyMinX = 240;
-    private const double TtBuyMaxX = 320;
-    private const double TtSellMinX = 320;
-    private const double TtSellMaxX = 400;
+    private const double TtBuyMaxX = 310;
+    private const double TtSellMinX = 310;
+    private const double TtSellMaxX = 370;
 
     // Y-coordinate tolerance for grouping words into the same row
     private const double YTolerance = 3.0;
