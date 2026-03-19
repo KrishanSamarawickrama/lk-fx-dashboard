@@ -46,6 +46,12 @@ public class ScraperOptions
     public string BocUrl { get; set; } =
         "https://www.boc.lk/rates-tariff";
 
+    /// <summary>
+    /// Sampath Bank exchange rates JSON API.
+    /// </summary>
+    public string SampathUrl { get; set; } =
+        "https://www.sampath.lk/api/exchange-rates";
+
     public int TimeoutSeconds { get; set; } = 30;
     public int PoliteDelayMs { get; set; } = 2000;
 }

@@ -9,6 +9,7 @@ public static class ScraperSource
     public const string Dfcc = "DFCC";
     public const string Hnb = "HNB";
     public const string Boc = "BOC";
+    public const string Sampath = "Sampath";
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -18,6 +19,7 @@ public static class ScraperSource
         Hsbc,
         Dfcc,
         Hnb,
-        Boc
+        Boc,
+        Sampath
     ];
 }
