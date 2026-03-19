@@ -139,7 +139,7 @@ app.MapRateEndpoints();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode(o =>
-        o.ContentSecurityFrameAncestorsPolicy = "'none'");
+        o.ContentSecurityFrameAncestorsPolicy = null);
 
 app.Run();
 
