@@ -1,12 +1,12 @@
 @inject IRateService RateService
 @inject NavigationManager Navigation
 
-<div class="flex items-center gap-3">
-    <label for="currency-select" class="text-sm font-medium text-gray-400">Currency</label>
+<div class="flex items-center gap-2.5">
+    <label for="currency-select" class="text-[10px] font-medium text-slate-500 uppercase tracking-[0.15em]">Currency</label>
     <select id="currency-select"
-            class="bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-4 py-2 text-sm
-                   focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none
-                   cursor-pointer hover:border-gray-600 transition-colors"
+            class="bg-surface border border-edge text-slate-200 rounded-lg px-3 py-1.5 text-sm
+                   focus:ring-1 focus:ring-accent/30 focus:border-accent/50 outline-none
+                   cursor-pointer hover:border-edge-hover transition-all"
             value="@SelectedCurrency"
             @onchange="OnCurrencyChanged">
         @foreach (var currency in Currencies)

@@ -1,20 +1,20 @@
-<div class="flex items-center gap-2 text-sm">
+<div class="flex items-center text-xs">
     @if (LastUpdated.HasValue)
     {
         var elapsed = DateTime.UtcNow - LastUpdated.Value;
         var isStale = elapsed.TotalHours > 25;
 
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-                     @(isStale ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400")">
-            <span class="relative flex h-2 w-2">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg
+                     @(isStale ? "bg-caution/10 text-caution" : "bg-positive/10 text-positive")">
+            <span class="relative flex h-1.5 w-1.5">
                 @if (isStale)
                 {
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-caution opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-caution"></span>
                 }
                 else
                 {
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-positive"></span>
                 }
             </span>
             Updated @FormatTimeAgo(elapsed)
@@ -22,7 +22,7 @@
     }
     else
     {
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-800 text-gray-500">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface text-slate-600">
             No data yet
         </span>
     }

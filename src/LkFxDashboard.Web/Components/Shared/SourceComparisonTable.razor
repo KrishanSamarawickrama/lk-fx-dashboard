@@ -1,17 +1,17 @@
-<div class="bg-gray-900 rounded-2xl shadow-lg p-6 border border-gray-800">
-    <h3 class="text-lg font-semibold text-gray-100 mb-4">Source Comparison</h3>
+<div class="bg-card/70 backdrop-blur-sm rounded-xl p-6 border border-edge">
+    <h3 class="text-base font-semibold text-slate-100 mb-5">Source Comparison</h3>
 
     @if (Rates.Count > 0)
     {
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto -mx-6 px-6">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-gray-800">
-                        <th class="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Buying Rate</th>
-                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Selling Rate</th>
-                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Spread</th>
-                        <th class="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <tr class="border-b border-edge">
+                        <th class="text-left py-2.5 pr-4 text-[10px] font-medium text-slate-600 uppercase tracking-[0.15em]">Source</th>
+                        <th class="text-right py-2.5 px-4 text-[10px] font-medium text-slate-600 uppercase tracking-[0.15em]">Buy</th>
+                        <th class="text-right py-2.5 px-4 text-[10px] font-medium text-slate-600 uppercase tracking-[0.15em]">Sell</th>
+                        <th class="text-right py-2.5 px-4 text-[10px] font-medium text-slate-600 uppercase tracking-[0.15em]">Spread</th>
+                        <th class="text-right py-2.5 pl-4 text-[10px] font-medium text-slate-600 uppercase tracking-[0.15em]">Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -19,18 +19,18 @@
                     {
                         var isBestBuy = rate.BuyingRate == Rates.Max(r => r.BuyingRate);
                         var isBestSell = rate.SellingRate == Rates.Min(r => r.SellingRate);
-                        <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
-                            <td class="py-3 px-4 font-medium text-gray-300">@rate.Source</td>
-                            <td class="py-3 px-4 text-right font-mono @(isBestBuy ? "text-emerald-400 font-semibold" : "text-gray-300")">
+                        <tr class="border-b border-edge/40 hover:bg-elevated/30 transition-colors">
+                            <td class="py-3 pr-4 font-medium text-slate-300">@rate.Source</td>
+                            <td class="py-3 px-4 text-right font-mono tabular-nums @(isBestBuy ? "text-accent font-semibold" : "text-slate-300")">
                                 @rate.BuyingRate.ToString("N2")
                             </td>
-                            <td class="py-3 px-4 text-right font-mono @(isBestSell ? "text-emerald-400 font-semibold" : "text-gray-300")">
+                            <td class="py-3 px-4 text-right font-mono tabular-nums @(isBestSell ? "text-accent font-semibold" : "text-slate-300")">
                                 @rate.SellingRate.ToString("N2")
                             </td>
-                            <td class="py-3 px-4 text-right font-mono text-gray-400">
+                            <td class="py-3 px-4 text-right font-mono tabular-nums text-slate-500">
                                 @((rate.SellingRate - rate.BuyingRate).ToString("N2"))
                             </td>
-                            <td class="py-3 px-4 text-right text-gray-500">
+                            <td class="py-3 pl-4 text-right text-slate-600 text-xs">
                                 @rate.RateDate.ToString("yyyy-MM-dd")
                             </td>
                         </tr>
@@ -41,7 +41,7 @@
     }
     else
     {
-        <div class="text-center py-8 text-gray-500">
+        <div class="text-center py-8 text-slate-600 text-sm">
             No rates available for comparison
         </div>
     }

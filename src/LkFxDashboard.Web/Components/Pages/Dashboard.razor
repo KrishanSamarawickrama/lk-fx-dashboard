@@ -5,14 +5,14 @@
 
 <PageTitle>LK FX Dashboard</PageTitle>
 
-<div class="space-y-6">
+<div class="space-y-8">
     <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-100">Exchange Rates</h1>
-            <p class="text-sm text-gray-500 mt-1">LKR per 1 @selectedCurrency</p>
+            <h1 class="text-3xl font-bold tracking-tight text-slate-50">Exchange Rates</h1>
+            <p class="text-sm text-slate-500 mt-1.5 font-mono">LKR / @selectedCurrency</p>
         </div>
-        <div class="flex items-center gap-4 flex-wrap">
+        <div class="flex items-center gap-3 flex-wrap">
             <CurrencySelector SelectedCurrency="@selectedCurrency"
                               SelectedCurrencyChanged="OnCurrencyChanged" />
             <LastUpdatedBadge LastUpdated="@lastUpdated" />
@@ -23,29 +23,29 @@
             else if (showPinEntry)
             {
                 <div class="flex items-center gap-2">
-                    <input type="password" maxlength="20" placeholder="Enter PIN"
-                           class="w-28 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500"
+                    <input type="password" maxlength="20" placeholder="PIN"
+                           class="w-24 px-3 py-1.5 bg-surface border border-edge rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all"
                            @bind="enteredPin" @bind:event="oninput"
                            @onkeydown="OnPinKeyDown" />
-                    <button class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors"
+                    <button class="px-3 py-1.5 bg-accent hover:bg-accent-dim text-slate-950 text-sm font-medium rounded-lg transition-colors"
                             @onclick="VerifyPin">
                         OK
                     </button>
-                    <button class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm rounded-lg transition-colors"
+                    <button class="px-3 py-1.5 bg-card hover:bg-elevated text-slate-400 text-sm rounded-lg transition-colors border border-edge"
                             @onclick="() => showPinEntry = false">
                         Cancel
                     </button>
                 </div>
                 @if (pinError is not null)
                 {
-                    <span class="text-rose-400 text-xs">@pinError</span>
+                    <span class="text-negative text-xs">@pinError</span>
                 }
             }
             else
             {
-                <button class="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded-lg transition-colors"
+                <button class="inline-flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-elevated text-slate-400 text-sm rounded-lg transition-colors border border-edge"
                         @onclick="() => showPinEntry = true">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -57,18 +57,22 @@
 
     @if (errorMessage is not null)
     {
-        <div class="bg-rose-900/30 border border-rose-700 rounded-xl p-4 text-rose-300 text-sm">
+        <div class="bg-negative/10 border border-negative/30 rounded-xl p-4 text-negative text-sm">
             @errorMessage
         </div>
     }
 
     <!-- Rate Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        @foreach (var source in ScraperSource.All)
+        @for (var i = 0; i < ScraperSource.All.Count; i++)
         {
+            var source = ScraperSource.All[i];
             var rate = latestRates.FirstOrDefault(r => r.Source == source);
             var prevRate = previousRates.FirstOrDefault(r => r.Source == source);
-            <RateSummaryCard Source="@source" Rate="@rate" PreviousRate="@prevRate" />
+            var delay = i * 50;
+            <div class="animate-fade-up" style="animation-delay: @(delay)ms">
+                <RateSummaryCard Source="@source" Rate="@rate" PreviousRate="@prevRate" />
+            </div>
         }
     </div>
 

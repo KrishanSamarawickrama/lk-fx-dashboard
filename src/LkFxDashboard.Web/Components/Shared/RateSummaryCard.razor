@@ -1,12 +1,15 @@
 @using LkFxDashboard.Core.Models
 
-<div class="bg-gray-900 rounded-2xl shadow-lg p-6 border border-gray-800 hover:border-gray-700 transition-colors">
+<div class="bg-card/70 backdrop-blur-sm rounded-xl p-5 border border-edge card-hover h-full">
     <div class="flex items-center justify-between mb-4">
-        <h3 class="text-sm font-medium text-gray-400">@Source</h3>
+        <div class="flex items-center gap-2.5">
+            <div class="w-1 h-8 rounded-full @SourceAccentClass"></div>
+            <h3 class="text-sm font-medium text-slate-300">@Source</h3>
+        </div>
         @if (TrendDirection != 0)
         {
-            <span class="text-xs font-medium px-2 py-1 rounded-full @(TrendDirection > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400")">
-                @(TrendDirection > 0 ? "\u2191" : "\u2193") @Math.Abs(TrendPercent).ToString("F2")%
+            <span class="text-[11px] font-medium font-mono px-2 py-0.5 rounded-md @(TrendDirection > 0 ? "bg-positive/10 text-positive" : "bg-negative/10 text-negative")">
+                @(TrendDirection > 0 ? "+" : "")@TrendPercent.ToString("F2")%
             </span>
         }
     </div>
@@ -15,20 +18,20 @@
     {
         <div class="space-y-3">
             <div class="flex justify-between items-baseline">
-                <span class="text-xs text-gray-500 uppercase tracking-wider">Buy</span>
-                <span class="text-2xl font-mono font-semibold text-gray-100">
+                <span class="text-[10px] text-slate-600 uppercase tracking-[0.15em] font-medium">Buy</span>
+                <span class="text-xl font-mono font-semibold text-slate-100 tabular-nums">
                     @Rate.BuyingRate.ToString("N2")
                 </span>
             </div>
             <div class="flex justify-between items-baseline">
-                <span class="text-xs text-gray-500 uppercase tracking-wider">Sell</span>
-                <span class="text-2xl font-mono font-semibold text-gray-100">
+                <span class="text-[10px] text-slate-600 uppercase tracking-[0.15em] font-medium">Sell</span>
+                <span class="text-xl font-mono font-semibold text-slate-100 tabular-nums">
                     @Rate.SellingRate.ToString("N2")
                 </span>
             </div>
-            <div class="flex justify-between items-baseline pt-2 border-t border-gray-800">
-                <span class="text-xs text-gray-500 uppercase tracking-wider">Spread</span>
-                <span class="text-sm font-mono text-gray-400">
+            <div class="flex justify-between items-baseline pt-2.5 border-t border-edge/60">
+                <span class="text-[10px] text-slate-600 uppercase tracking-[0.15em] font-medium">Spread</span>
+                <span class="text-xs font-mono text-slate-500 tabular-nums">
                     @((Rate.SellingRate - Rate.BuyingRate).ToString("N2"))
                 </span>
             </div>
@@ -36,8 +39,8 @@
     }
     else
     {
-        <div class="text-center py-4 text-gray-500 text-sm">
-            No data available
+        <div class="flex items-center justify-center py-6 text-slate-600 text-sm">
+            No data
         </div>
     }
 </div>
@@ -70,4 +73,17 @@
             return (Rate.BuyingRate - PreviousRate.BuyingRate) / PreviousRate.BuyingRate * 100;
         }
     }
+
+    private string SourceAccentClass => Source switch
+    {
+        "CBSL" => "bg-sky-400",
+        "Standard Chartered" => "bg-teal-400",
+        "Commercial Bank" => "bg-blue-400",
+        "HSBC" => "bg-rose-400",
+        "DFCC" => "bg-amber-400",
+        "HNB" => "bg-violet-400",
+        "BOC" => "bg-orange-400",
+        "Sampath" => "bg-emerald-400",
+        _ => "bg-slate-400"
+    };
 }
