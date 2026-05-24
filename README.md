@@ -17,7 +17,7 @@ A daily foreign exchange rate monitoring dashboard for Sri Lanka. Scrapes buy/se
 - **Manual Refresh** — Trigger a scrape on demand with a loading spinner
 - **Stale Data Indicator** — Last Updated badge pulses amber if data is >25 hours old
 - **REST API** — JSON endpoints for external consumers
-- **Automated Scraping** — Daily at 08:00 SLST (UTC+5:30) via background service
+- **Automated Scraping** — Daily at 09:00 and 11:30 SLST (UTC+5:30) via background service
 
 ## Data Sources
 
@@ -87,7 +87,7 @@ LkFxDashboard.AppHost          ← Aspire orchestrator (startup project)
 **Single-host design:** The Web project co-hosts Blazor SSR, the REST API, and the background scraping service. Blazor components inject services directly — no HTTP self-calls.
 
 **Data flow:**
-1. `RateScrapingBackgroundService` runs on startup then daily at 08:00 SLST
+1. `RateScrapingBackgroundService` runs on startup then daily at 09:00 and 11:30 SLST
 2. Each `IExchangeRateScraper` fetches rates → repository persists to PostgreSQL
 3. Blazor pages and API endpoints read from the same repository
 

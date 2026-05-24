@@ -12,7 +12,11 @@ public class RateScrapingBackgroundService(
     private static readonly TimeZoneInfo SriLankaTimeZone =
         TimeZoneInfo.FindSystemTimeZoneById("Asia/Colombo");
 
-    private const int ScheduledHour = 8; // 08:00 SLST
+    private static readonly TimeSpan[] ScheduledTimes =
+    [
+        new(9, 0, 0),   // 09:00 SLST
+        new(11, 30, 0), // 11:30 SLST
+    ];
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -23,10 +27,10 @@ public class RateScrapingBackgroundService(
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            var delay = CalculateDelayUntilNext();
+            var (delay, nextRunSl) = CalculateDelayUntilNext();
             logger.LogInformation(
-                "Next scrape scheduled in {Hours:F1} hours at 08:00 SLST",
-                delay.TotalHours);
+                "Next scrape scheduled in {Hours:F1} hours at {Time:HH:mm} SLST",
+                delay.TotalHours, nextRunSl);
 
             try
             {
@@ -111,18 +115,28 @@ public class RateScrapingBackgroundService(
         return 0;
     }
 
-    private static TimeSpan CalculateDelayUntilNext()
+    private static (TimeSpan Delay, DateTime NextRunSl) CalculateDelayUntilNext()
     {
         var nowUtc = DateTime.UtcNow;
         var nowSl = TimeZoneInfo.ConvertTimeFromUtc(nowUtc, SriLankaTimeZone);
 
-        var nextRun = nowSl.Date.AddHours(ScheduledHour);
-        if (nowSl >= nextRun)
+        DateTime nextRun = default;
+        foreach (var time in ScheduledTimes)
         {
-            nextRun = nextRun.AddDays(1);
+            var candidate = nowSl.Date + time;
+            if (nowSl < candidate)
+            {
+                nextRun = candidate;
+                break;
+            }
+        }
+
+        if (nextRun == default)
+        {
+            nextRun = nowSl.Date.AddDays(1) + ScheduledTimes[0];
         }
 
         var nextRunUtc = TimeZoneInfo.ConvertTimeToUtc(nextRun, SriLankaTimeZone);
-        return nextRunUtc - nowUtc;
+        return (nextRunUtc - nowUtc, nextRun);
     }
 }

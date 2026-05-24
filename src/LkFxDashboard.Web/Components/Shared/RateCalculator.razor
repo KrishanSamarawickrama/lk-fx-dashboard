@@ -1,0 +1,266 @@
+@using System.Globalization
+
+<div class="bg-card/70 backdrop-blur-sm rounded-xl p-5 border border-edge">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div class="flex items-center gap-2.5">
+            <div class="w-1 h-8 rounded-full bg-accent"></div>
+            <div>
+                <h3 class="text-sm font-medium text-slate-300">Calculator</h3>
+                <p class="text-[10px] text-slate-600 uppercase tracking-[0.15em] font-medium mt-0.5">@Currency &harr; LKR</p>
+            </div>
+        </div>
+        <div class="flex gap-1 bg-surface rounded-lg p-0.5">
+            @foreach (var option in new[] { RateMode.Buy, RateMode.Sell, RateMode.Mid })
+            {
+                var m = option;
+                <button class="px-3 py-1 text-xs font-medium rounded-md transition-all
+                               @(mode == m
+                                   ? "bg-accent text-slate-950 shadow-sm"
+                                   : "text-slate-500 hover:text-slate-300")"
+                        @onclick="() => OnModeChanged(m)">
+                    @m.ToString()
+                </button>
+            }
+        </div>
+    </div>
+
+    @if (AvailableRates.Count == 0)
+    {
+        <div class="flex items-center justify-center py-6 text-slate-600 text-sm">
+            No data
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-[10px] text-slate-600 uppercase tracking-[0.15em] font-medium mb-1.5">@Currency</label>
+                <input type="text" inputmode="decimal" autocomplete="off"
+                       value="@fxText"
+                       @oninput="OnFxInput"
+                       @onfocus="OnFxFocus"
+                       @onblur="OnFxBlur"
+                       class="w-full px-3 py-2 bg-surface border border-edge rounded-lg text-base font-mono tabular-nums text-slate-100 placeholder-slate-600 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all" />
+            </div>
+            <div>
+                <label class="block text-[10px] text-slate-600 uppercase tracking-[0.15em] font-medium mb-1.5">LKR</label>
+                <input type="text" inputmode="decimal" autocomplete="off"
+                       value="@lkrText"
+                       @oninput="OnLkrInput"
+                       @onfocus="OnLkrFocus"
+                       @onblur="OnLkrBlur"
+                       class="w-full px-3 py-2 bg-surface border border-edge rounded-lg text-base font-mono tabular-nums text-slate-100 placeholder-slate-600 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all" />
+            </div>
+            <div>
+                <label class="block text-[10px] text-slate-600 uppercase tracking-[0.15em] font-medium mb-1.5">Bank</label>
+                <select value="@selectedBank"
+                        @onchange="OnBankChanged"
+                        class="w-full px-3 py-2 bg-surface border border-edge rounded-lg text-base text-slate-100 cursor-pointer hover:border-edge-hover focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all">
+                    @foreach (var r in AvailableRates)
+                    {
+                        <option value="@r.Source">@r.Source &mdash; @GetRate(r)?.ToString("N2", CultureInfo.InvariantCulture)</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        var better = FindBetterBank();
+        @if (better is not null)
+        {
+            <div class="mt-4 flex items-center gap-3 px-4 py-2.5 bg-positive/10 border border-positive/30 rounded-lg">
+                <svg class="h-4 w-4 text-positive flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span class="text-sm text-slate-200">
+                    <span class="font-medium">@better.Value.Bank</span>
+                    gives you
+                    <span class="font-mono font-semibold text-positive tabular-nums">
+                        @FormatResult(better.Value.Result) @TargetUnit
+                    </span>
+                    <span class="text-slate-500">
+                        (+@FormatResult(better.Value.Delta) @TargetUnit)
+                    </span>
+                </span>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Currency { get; set; } = "USD";
+
+    [Parameter]
+    public IReadOnlyList<ExchangeRate> Rates { get; set; } = [];
+
+    private enum RateMode { Buy, Sell, Mid }
+    private enum EditField { Fx, Lkr }
+
+    private RateMode mode = RateMode.Buy;
+    private EditField lastEdited = EditField.Fx;
+    private string fxText = string.Empty;
+    private string lkrText = string.Empty;
+    private string selectedBank = string.Empty;
+    private bool initialized;
+
+    private List<ExchangeRate> AvailableRates =>
+        Rates.Where(r => string.Equals(r.TargetCurrency, Currency, StringComparison.OrdinalIgnoreCase))
+             .ToList();
+
+    private ExchangeRate? SelectedRate =>
+        AvailableRates.FirstOrDefault(r => r.Source == selectedBank);
+
+    private string TargetUnit => lastEdited == EditField.Fx ? "LKR" : Currency;
+
+    protected override void OnParametersSet()
+    {
+        var available = AvailableRates;
+        if (available.Count == 0)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(selectedBank) || available.All(r => r.Source != selectedBank))
+        {
+            selectedBank = available[0].Source;
+        }
+
+        if (!initialized)
+        {
+            fxText = FormatAmount(100m);
+            lastEdited = EditField.Fx;
+            initialized = true;
+        }
+
+        RecomputeFromLastEdited();
+    }
+
+    private decimal? GetRate(ExchangeRate? r) => r is null ? null : mode switch
+    {
+        RateMode.Buy => r.BuyingRate,
+        RateMode.Sell => r.SellingRate,
+        RateMode.Mid => (r.BuyingRate + r.SellingRate) / 2m,
+        _ => r.BuyingRate
+    };
+
+    private void OnFxInput(ChangeEventArgs e)
+    {
+        fxText = e.Value?.ToString() ?? string.Empty;
+        lastEdited = EditField.Fx;
+        RecomputeOtherSide();
+    }
+
+    private void OnLkrInput(ChangeEventArgs e)
+    {
+        lkrText = e.Value?.ToString() ?? string.Empty;
+        lastEdited = EditField.Lkr;
+        RecomputeOtherSide();
+    }
+
+    private void OnFxFocus() => fxText = StripGrouping(fxText);
+
+    private void OnLkrFocus() => lkrText = StripGrouping(lkrText);
+
+    private void OnFxBlur()
+    {
+        if (TryParseAmount(fxText, out var v))
+            fxText = FormatAmount(v);
+    }
+
+    private void OnLkrBlur()
+    {
+        if (TryParseAmount(lkrText, out var v))
+            lkrText = FormatAmount(v);
+    }
+
+    private void OnBankChanged(ChangeEventArgs e)
+    {
+        selectedBank = e.Value?.ToString() ?? selectedBank;
+        RecomputeFromLastEdited();
+    }
+
+    private void OnModeChanged(RateMode newMode)
+    {
+        mode = newMode;
+        RecomputeFromLastEdited();
+    }
+
+    private void RecomputeFromLastEdited() => RecomputeOtherSide();
+
+    private void RecomputeOtherSide()
+    {
+        var rate = GetRate(SelectedRate);
+        if (rate is null or <= 0)
+        {
+            if (lastEdited == EditField.Fx) lkrText = string.Empty;
+            else fxText = string.Empty;
+            return;
+        }
+
+        if (lastEdited == EditField.Fx)
+        {
+            if (TryParseAmount(fxText, out var fx) && fx > 0)
+                lkrText = FormatAmount(fx * rate.Value);
+            else
+                lkrText = string.Empty;
+        }
+        else
+        {
+            if (TryParseAmount(lkrText, out var lkr) && lkr > 0)
+                fxText = FormatAmount(lkr / rate.Value);
+            else
+                fxText = string.Empty;
+        }
+    }
+
+    private static bool TryParseAmount(string? text, out decimal value) =>
+        decimal.TryParse(StripGrouping(text), NumberStyles.Any, CultureInfo.InvariantCulture, out value);
+
+    private static string StripGrouping(string? text) =>
+        string.IsNullOrEmpty(text) ? string.Empty : text.Replace(",", string.Empty);
+
+    private static string FormatAmount(decimal value) =>
+        Math.Round(value, 2).ToString("N2", CultureInfo.InvariantCulture);
+
+    private (string Bank, decimal Result, decimal Delta)? FindBetterBank()
+    {
+        var selRate = GetRate(SelectedRate);
+        if (selRate is null or <= 0) return null;
+
+        if (lastEdited == EditField.Fx)
+        {
+            if (!TryParseAmount(fxText, out var fx) || fx <= 0) return null;
+
+            var selectedResult = fx * selRate.Value;
+            var ranked = AvailableRates
+                .Select(r => new { r.Source, Rate = GetRate(r) })
+                .Where(x => x.Rate is > 0)
+                .Select(x => new { x.Source, Result = fx * x.Rate!.Value })
+                .OrderByDescending(x => x.Result)
+                .FirstOrDefault();
+
+            if (ranked is null || ranked.Source == selectedBank) return null;
+            if (ranked.Result <= selectedResult) return null;
+            return (ranked.Source, Math.Round(ranked.Result, 2), Math.Round(ranked.Result - selectedResult, 2));
+        }
+        else
+        {
+            if (!TryParseAmount(lkrText, out var lkr) || lkr <= 0) return null;
+
+            var selectedResult = lkr / selRate.Value;
+            var ranked = AvailableRates
+                .Select(r => new { r.Source, Rate = GetRate(r) })
+                .Where(x => x.Rate is > 0)
+                .Select(x => new { x.Source, Result = lkr / x.Rate!.Value })
+                .OrderByDescending(x => x.Result)
+                .FirstOrDefault();
+
+            if (ranked is null || ranked.Source == selectedBank) return null;
+            if (ranked.Result <= selectedResult) return null;
+            return (ranked.Source, Math.Round(ranked.Result, 2), Math.Round(ranked.Result - selectedResult, 2));
+        }
+    }
+
+    private static string FormatResult(decimal v) => FormatAmount(v);
+}
